@@ -34,9 +34,9 @@ object AskingActorsFunctionally extends App {
     import ExternalStuffDoNotTouch._
 
     import ExecutionContext.Implicits.global
-    implicit val timeout: Timeout = 1.second
 
     class StringStatsCalculator(lengthCalculator: ActorRef, palindromeChecker: ActorRef) extends Actor {
+      implicit val timeout: Timeout = 1.second
       def receive = {
         case subject: String =>
           val result: Future[StringStats] = for {
@@ -71,9 +71,8 @@ object AskingActorsFunctionally extends App {
       } yield StringStats(length, palindrome)
     }
 
-    def askActor[A, B: ClassTag](actor: ActorRef): ReaderT[Future, A, B] = ReaderT { (s: A) =>
-      implicit val timeout: Timeout = 1.second
-      (actor ? s).mapTo[B]
+    def askActor[A, B: ClassTag](actor: ActorRef): ReaderT[Future, A, B] = ReaderT { (question: A) =>
+      actor.ask(question)(1.second).mapTo[B]
     }
 
     def runStringStatsApp(subject: String): StringStats = {
