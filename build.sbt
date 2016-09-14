@@ -19,7 +19,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe" % "config" % typesafeConfigVersion,
     "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
-    "junit" % "junit" % junitVersion % Test
+    "junit" % "junit" % junitVersion % Test,
+    "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test
   )
 }
 

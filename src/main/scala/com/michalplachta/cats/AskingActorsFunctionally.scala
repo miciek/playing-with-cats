@@ -30,13 +30,14 @@ object AskingActorsFunctionally extends App {
     }
   }
 
-  object ClassicalApproach {
+  object ClassicApproach {
     import ExternalStuffDoNotTouch._
 
     import ExecutionContext.Implicits.global
 
     class StringStatsCalculator(lengthCalculator: ActorRef, palindromeChecker: ActorRef) extends Actor {
       implicit val timeout: Timeout = 1.second
+
       def receive = {
         case subject: String =>
           val result: Future[StringStats] = for {
@@ -50,6 +51,7 @@ object AskingActorsFunctionally extends App {
 
     def runStringStatsApp(subject: String): StringStats = {
       implicit val system = ActorSystem("AskingActorsClassically")
+      implicit val timeout: Timeout = 1.second
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
       val stringProcessor = system.actorOf(Props(classOf[StringStatsCalculator], lengthCalculator, palindromeChecker), "stringProcessor")
@@ -88,6 +90,6 @@ object AskingActorsFunctionally extends App {
     }
   }
 
-  println(s"[ClassicalApproach] StringStats for 'abba': ${ClassicalApproach.runStringStatsApp("abba")}")
+  println(s"[ClassicApproach] StringStats for 'abba': ${ClassicApproach.runStringStatsApp("abba")}")
   println(s"[FunctionalApproach] StringStats for 'abba': ${FunctionalApproach.runStringStatsApp("abba")}")
 }
