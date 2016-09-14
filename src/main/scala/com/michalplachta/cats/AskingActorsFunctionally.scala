@@ -14,24 +14,28 @@ import scala.language.higherKinds
 import scala.reflect.ClassTag
 
 object AskingActorsFunctionally extends App {
-  import ExecutionContext.Implicits.global
-  implicit val timeout: Timeout = 1.second
+  object ExternalStuffDoNotTouch {
+    case class StringStats(length: Int, palindrome: Boolean)
 
-  case class StringStats(length: Int, palindrome: Boolean)
-
-  class LengthCalculator extends Actor {
-    def receive = {
-      case subject: String => sender() ! subject.length
+    class LengthCalculator extends Actor {
+      def receive = {
+        case subject: String => sender() ! subject.length
+      }
     }
-  }
 
-  class PalindromeChecker extends Actor {
-    def receive = {
-      case subject: String => sender() ! (subject.reverse == subject)
+    class PalindromeChecker extends Actor {
+      def receive = {
+        case subject: String => sender() ! (subject.reverse == subject)
+      }
     }
   }
 
   object ClassicalApproach {
+    import ExternalStuffDoNotTouch._
+
+    import ExecutionContext.Implicits.global
+    implicit val timeout: Timeout = 1.second
+
     class StringStatsCalculator(lengthCalculator: ActorRef, palindromeChecker: ActorRef) extends Actor {
       def receive = {
         case subject: String =>
@@ -57,6 +61,8 @@ object AskingActorsFunctionally extends App {
   }
 
   object FunctionalApproach {
+    import ExternalStuffDoNotTouch._
+
     def stringStats[F[_]: Monad](calculateLength: ReaderT[F, String, Int],
                                  checkIfPalindrome: ReaderT[F, String, Boolean]): ReaderT[F, String, StringStats] = {
       for {
@@ -66,10 +72,13 @@ object AskingActorsFunctionally extends App {
     }
 
     def askActor[A, B: ClassTag](actor: ActorRef): ReaderT[Future, A, B] = ReaderT { (s: A) =>
+      implicit val timeout: Timeout = 1.second
       (actor ? s).mapTo[B]
     }
 
     def runStringStatsApp(subject: String): StringStats = {
+      import ExecutionContext.Implicits.global
+
       implicit val system = ActorSystem("AskingActorsClassically")
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
