@@ -10,7 +10,7 @@ class GettingRidOfFuturesAsyncSpec extends AsyncWordSpec with Matchers {
     "addIntsInFuture" should {
       "return a 5 when adding 2 and future 3 (async assertion)" in {
         val resultPromise: Future[Int] = GettingRidOfFutures.addIntsInFuture(2, Future.successful(3))
-        resultPromise map { result => result should be(5) }
+        resultPromise map { _ should be(5) }
       }
     }
   }

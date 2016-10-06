@@ -1,6 +1,6 @@
 package com.michalplachta.cats
 
-import cats.Monad
+import cats.Functor
 import cats.implicits._
 
 import scala.Numeric.Implicits._
@@ -17,13 +17,13 @@ object GettingRidOfFutures extends App {
     } yield local + fetched
   }
 
-  def addIntsInContext[M[_] : Monad](local: Int, fetchFromContext: M[Int]): M[Int] = {
+  def addIntsInContext[F[_] : Functor](local: Int, fetchFromContext: F[Int]): F[Int] = {
     for {
       fetched <- fetchFromContext
     } yield local + fetched
   }
 
-  def addInContext[M[_] : Monad, A : Numeric](local: A, fetchFromContext: M[A]): M[A] = {
+  def addInContext[F[_] : Functor, A : Numeric](local: A, fetchFromContext: F[A]): F[A] = {
     for {
       fetched <- fetchFromContext
     } yield local + fetched
