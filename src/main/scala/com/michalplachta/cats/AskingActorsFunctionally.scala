@@ -39,15 +39,15 @@ object AskingActorsFunctionally extends App {
 
       def receive = {
         case subject: String =>
-          val lengthFuture = (lengthCalculator ? subject).mapTo[Int]
-          val palindromeFuture = (palindromeChecker ? subject).mapTo[Boolean]
-          val resultFuture = for {
-            length <- lengthFuture
-            palindrome <- palindromeFuture
+          val futureLength = (lengthCalculator ? subject).mapTo[Int]
+          val futurePalindromeCheck = (palindromeChecker ? subject).mapTo[Boolean]
+          val futureStats = for {
+            length <- futureLength
+            palindrome <- futurePalindromeCheck
           } yield StringStats(length, palindrome)
 
           val requester = sender
-          resultFuture.onSuccess { case stats: StringStats => requester ! stats }
+          futureStats.onSuccess { case stats: StringStats => requester ! stats }
       }
     }
 
@@ -57,12 +57,12 @@ object AskingActorsFunctionally extends App {
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
 
-      val stringProcessor = system.actorOf(Props(classOf[StringStatsCalculator], lengthCalculator, palindromeChecker), "stringProcessor")
-      val futureStats: Future[StringStats] = (stringProcessor ? subject).mapTo[StringStats]
-      val result = Await.result(futureStats, 5 seconds)
+      val statsCalculator = system.actorOf(Props(classOf[StringStatsCalculator], lengthCalculator, palindromeChecker), "statsCalculator")
+      val futureStats = (statsCalculator ? subject).mapTo[StringStats]
+      val stats = Await.result(futureStats, 5 seconds)
 
       system.terminate()
-      result
+      stats
     }
   }
 
@@ -77,8 +77,8 @@ object AskingActorsFunctionally extends App {
       } yield StringStats(length, palindrome)
     }
 
-    def askActor[A, B: ClassTag](actor: ActorRef): ReaderT[Future, A, B] = ReaderT { (question: A) =>
-      actor.ask(question)(1 second).mapTo[B]
+    def askActor[Q, A: ClassTag](actor: ActorRef): ReaderT[Future, Q, A] = ReaderT { (question: Q) =>
+      actor.ask(question)(1 second).mapTo[A]
     }
 
     def runStringStatsApp(subject: String): StringStats = {
@@ -87,7 +87,8 @@ object AskingActorsFunctionally extends App {
       implicit val system = ActorSystem("AskingActorsClassically")
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
-      val futureStats: Future[StringStats] = stringStats(askActor(lengthCalculator), askActor(palindromeChecker)).run(subject)
+
+      val futureStats = stringStats(askActor(lengthCalculator), askActor(palindromeChecker)).run(subject)
       val result = Await.result(futureStats, 5 second)
 
       system.terminate()
