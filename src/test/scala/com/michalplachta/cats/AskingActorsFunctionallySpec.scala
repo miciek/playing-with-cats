@@ -24,7 +24,7 @@ class AskingActorsFunctionallySpec extends TestKit(ActorSystem("AskingActors"))
       When("we send a String to the tested actor")
       underTest ! "abba"
 
-      Then("mocked responses should be sent to it")
+      And("mocked palindrome and length responses are provided")
       lengthCalculatorProbe.expectMsg("abba")
       lengthCalculatorProbe.reply(4)
 
