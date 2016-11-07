@@ -84,7 +84,7 @@ object AskingActorsFunctionally extends App {
     def runStringStatsApp(subject: String): StringStats = {
       import ExecutionContext.Implicits.global
 
-      implicit val system = ActorSystem("AskingActorsClassically")
+      implicit val system = ActorSystem("AskingActorsFunctionally")
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
 
