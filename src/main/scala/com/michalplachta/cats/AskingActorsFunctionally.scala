@@ -47,7 +47,7 @@ object AskingActorsFunctionally extends App {
           } yield StringStats(length, palindrome)
 
           val requester = sender
-          futureStats.onSuccess { case stats: StringStats => requester ! stats }
+          futureStats.foreach(requester ! _)
       }
     }
 
@@ -70,11 +70,12 @@ object AskingActorsFunctionally extends App {
     import ExternalStuffDoNotTouch._
 
     def stringStats[F[_]: Monad](calculateLength: ReaderT[F, String, Int],
-                                 checkIfPalindrome: ReaderT[F, String, Boolean]): ReaderT[F, String, StringStats] = {
+                                 checkIfPalindrome: ReaderT[F, String, Boolean]
+                                ): ReaderT[F, String, StringStats] = {
       for {
         length <- calculateLength
-        palindrome <- checkIfPalindrome
-      } yield StringStats(length, palindrome)
+        isPalindrome <- checkIfPalindrome
+      } yield StringStats(length, isPalindrome)
     }
 
     def askActor[Q, A: ClassTag](actor: ActorRef): ReaderT[Future, Q, A] = ReaderT { (question: Q) =>
@@ -88,7 +89,8 @@ object AskingActorsFunctionally extends App {
       val lengthCalculator = system.actorOf(Props[LengthCalculator], "lengthCalculator")
       val palindromeChecker = system.actorOf(Props[PalindromeChecker], "palindromeChecker")
 
-      val futureStats = stringStats(askActor(lengthCalculator), askActor(palindromeChecker)).run(subject)
+      val calculateStats = stringStats(askActor(lengthCalculator), askActor(palindromeChecker))
+      val futureStats = calculateStats.run(subject)
       val result = Await.result(futureStats, 5 second)
 
       system.terminate()
