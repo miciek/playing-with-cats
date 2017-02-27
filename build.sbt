@@ -9,10 +9,10 @@ scalaVersion := "2.11.8"
 resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= {
-  val catsVersion = "0.7.2"
-  val akkaVersion = "2.4.10"
-  val typesafeConfigVersion = "1.3.0"
-  val scalaTestVersion = "3.0.0"
+  val catsVersion = "0.9.0"
+  val akkaVersion = "2.4.17"
+  val typesafeConfigVersion = "1.3.1"
+  val scalaTestVersion = "3.0.1"
   val junitVersion = "4.12"
   Seq(
     "org.typelevel" %% "cats" % catsVersion,
@@ -25,3 +25,17 @@ libraryDependencies ++= {
 }
 
 fork := true
+
+import scalariform.formatter.preferences._
+import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
+
+SbtScalariform.scalariformSettings
+
+ScalariformKeys.preferences := ScalariformKeys.preferences.value
+  .setPreference(AlignParameters, true)
+  .setPreference(AlignArguments, true)
+  .setPreference(AlignSingleLineCaseStatements, true)
+  .setPreference(DoubleIndentClassDeclaration, true)
+  .setPreference(DanglingCloseParenthesis, Preserve)
+  .setPreference(RewriteArrowSymbols, true)

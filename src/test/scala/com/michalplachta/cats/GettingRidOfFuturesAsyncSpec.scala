@@ -1,7 +1,7 @@
 package com.michalplachta.cats
 
 import cats.Id
-import org.scalatest.{AsyncWordSpec, Matchers}
+import org.scalatest.{ AsyncWordSpec, Matchers }
 
 import scala.concurrent.Future
 

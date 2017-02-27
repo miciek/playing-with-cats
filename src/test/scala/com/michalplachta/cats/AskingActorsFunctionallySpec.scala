@@ -1,7 +1,7 @@
 package com.michalplachta.cats
 
-import akka.actor.{ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit, TestProbe}
+import akka.actor.{ ActorSystem, Props }
+import akka.testkit.{ ImplicitSender, TestKit, TestProbe }
 
 import cats.Id
 import cats.data.ReaderT
@@ -10,10 +10,10 @@ import com.michalplachta.cats.AskingActorsFunctionally.ClassicApproach.StringSta
 import com.michalplachta.cats.AskingActorsFunctionally.ExternalStuffDoNotTouch.StringStats
 import com.michalplachta.cats.AskingActorsFunctionally.FunctionalApproach.stringStats
 
-import org.scalatest.{GivenWhenThen, Matchers, WordSpecLike}
+import org.scalatest.{ GivenWhenThen, Matchers, WordSpecLike }
 
 class AskingActorsFunctionallySpec extends TestKit(ActorSystem("AskingActors"))
-                                   with WordSpecLike with Matchers with ImplicitSender with GivenWhenThen {
+    with WordSpecLike with Matchers with ImplicitSender with GivenWhenThen {
   "The tests are not very nice" when {
     "StringStatsCalculator actor should return proper StringStats for 'abba'" in {
       Given("properly configured actor system")
@@ -39,8 +39,8 @@ class AskingActorsFunctionallySpec extends TestKit(ActorSystem("AskingActors"))
   "The tests are nice" when {
     "stringStats function should return proper StringStats for 'abba'" in {
       Given("some mocked responses")
-      val mockedCalculateLength = ReaderT[Id, String, Int] { (s: String) => 4 }
-      val mockedCheckPalindrome = ReaderT[Id, String, Boolean] { (s: String) => true }
+      val mockedCalculateLength = ReaderT[Id, String, Int] { (s: String) ⇒ 4 }
+      val mockedCheckPalindrome = ReaderT[Id, String, Boolean] { (s: String) ⇒ true }
 
       When("we run stringStats function against a String")
       val result = stringStats(mockedCalculateLength, mockedCheckPalindrome).run("abba")

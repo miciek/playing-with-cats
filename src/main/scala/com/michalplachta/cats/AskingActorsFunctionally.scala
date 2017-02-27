@@ -1,6 +1,6 @@
 package com.michalplachta.cats
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{ Actor, ActorRef, ActorSystem, Props }
 import akka.pattern.ask
 import akka.util.Timeout
 
@@ -9,7 +9,7 @@ import cats.data.ReaderT
 import cats.implicits._
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ Await, ExecutionContext, Future }
 import scala.language.higherKinds
 import scala.reflect.ClassTag
 
@@ -19,13 +19,13 @@ object AskingActorsFunctionally extends App {
 
     class LengthCalculator extends Actor {
       def receive = {
-        case subject: String => sender ! subject.length
+        case subject: String ⇒ sender ! subject.length
       }
     }
 
     class PalindromeChecker extends Actor {
       def receive = {
-        case subject: String => sender ! (subject.reverse == subject)
+        case subject: String ⇒ sender ! (subject.reverse == subject)
       }
     }
   }
@@ -38,12 +38,12 @@ object AskingActorsFunctionally extends App {
       implicit val timeout: Timeout = 1 second
 
       def receive = {
-        case subject: String =>
+        case subject: String ⇒
           val futureLength = (lengthCalculator ? subject).mapTo[Int]
           val futurePalindromeCheck = (palindromeChecker ? subject).mapTo[Boolean]
           val futureStats = for {
-            length <- futureLength
-            palindrome <- futurePalindromeCheck
+            length ← futureLength
+            palindrome ← futurePalindromeCheck
           } yield StringStats(length, palindrome)
 
           val requester = sender
@@ -69,16 +69,17 @@ object AskingActorsFunctionally extends App {
   object FunctionalApproach {
     import ExternalStuffDoNotTouch._
 
-    def stringStats[F[_]: Monad](calculateLength: ReaderT[F, String, Int],
-                                 checkIfPalindrome: ReaderT[F, String, Boolean]
-                                ): ReaderT[F, String, StringStats] = {
+    def stringStats[F[_]: Monad](
+      calculateLength:   ReaderT[F, String, Int],
+      checkIfPalindrome: ReaderT[F, String, Boolean]
+    ): ReaderT[F, String, StringStats] = {
       for {
-        length <- calculateLength
-        isPalindrome <- checkIfPalindrome
+        length ← calculateLength
+        isPalindrome ← checkIfPalindrome
       } yield StringStats(length, isPalindrome)
     }
 
-    def askActor[Q, A: ClassTag](actor: ActorRef): ReaderT[Future, Q, A] = ReaderT { (question: Q) =>
+    def askActor[Q, A: ClassTag](actor: ActorRef): ReaderT[Future, Q, A] = ReaderT { (question: Q) ⇒
       actor.ask(question)(1 second).mapTo[A]
     }
 
