@@ -1,7 +1,7 @@
 package com.michalplachta.cats
 
 import cats.Id
-import org.scalatest.{ AsyncWordSpec, Matchers }
+import org.scalatest.{AsyncWordSpec, Matchers}
 
 import scala.concurrent.Future
 
@@ -9,7 +9,8 @@ class GettingRidOfFuturesAsyncSpec extends AsyncWordSpec with Matchers {
   "The tests are not very nice" when {
     "addIntsInFuture" should {
       "return a 5 when adding 2 and future 3 (async assertion)" in {
-        val resultPromise: Future[Int] = GettingRidOfFutures.addIntsInFuture(2, Future.successful(3))
+        val resultPromise: Future[Int] =
+          GettingRidOfFutures.addIntsInFuture(2, Future.successful(3))
         resultPromise map { _ should be(5) }
       }
     }
