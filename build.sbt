@@ -10,7 +10,7 @@ resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= {
   val catsV = "1.1.0"
-  val akkaV = "2.4.17"
+  val akkaV = "2.5.11"
   val configV = "1.3.1"
   val scalatestV = "3.0.1"
   Seq(
