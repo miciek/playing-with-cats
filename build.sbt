@@ -34,7 +34,7 @@ scalacOptions ++= Seq(
   "-Xlint"
 )
 
-scalafmtVersion in ThisBuild := "1.3.0"
+scalafmtVersion in ThisBuild := "1.4.0"
 scalafmtOnCompile in ThisBuild := true
 
 fork := true
